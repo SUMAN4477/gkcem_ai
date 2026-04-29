@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GKCEM — AI Interface</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<header>
+  <h1>GKCEM</h1>
+  <span>NEURAL INTELLIGENCE INTERFACE v2.6 // VOICE ENABLED</span>
+</header>
+
+<div class="main-wrap">
+
+  <!-- STATUS -->
+  <div class="status-bar">
+    <div><span class="status-dot" id="status-dot"></span><span id="status-text">STANDBY</span></div>
+    <div>|</div>
+    <div>SYS: ONLINE</div>
+    <div>|</div>
+    <div>VOICE: <span id="voice-status">ACTIVE</span></div>
+    <div>|</div>
+    <button id="voice-toggle" onclick="toggleVoice()">🔊 VOICE ON</button>
+  </div>
+
+  <!-- FACE -->
+  <div class="face-container">
+    <svg id="face-svg" viewBox="-170 -170 340 340" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="faceGrad" cx="50%" cy="45%" r="55%">
+          <stop offset="0%" stop-color="#1a3a6e"/>
+          <stop offset="60%" stop-color="#0d2244"/>
+          <stop offset="100%" stop-color="#06090f"/>
+        </radialGradient>
+        <radialGradient id="eyeGrad" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#4dd9f0"/>
+          <stop offset="100%" stop-color="#0a4a6e"/>
+        </radialGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <clipPath id="faceClip">
+          <ellipse cx="0" cy="-5" rx="110" ry="135"/>
+        </clipPath>
+      </defs>
+
+      <!-- Outer circles -->
+      <circle cx="0" cy="0" r="160" fill="none" stroke="rgba(77,217,240,0.12)" stroke-width="1"/>
+      <circle cx="0" cy="0" r="148" fill="none" stroke="rgba(77,217,240,0.08)" stroke-width="0.5"/>
+      <circle cx="0" cy="0" r="130" fill="none" stroke="rgba(77,217,240,0.15)" stroke-width="1"/>
+
+      <!-- Cross hairs -->
+      <line x1="-165" y1="0" x2="-118" y2="0" stroke="rgba(77,217,240,0.5)" stroke-width="1"/>
+      <line x1="118" y1="0" x2="165" y2="0" stroke="rgba(77,217,240,0.5)" stroke-width="1"/>
+      <line x1="0" y1="-165" x2="0" y2="-118" stroke="rgba(77,217,240,0.5)" stroke-width="1"/>
+      <circle cx="-165" cy="0" r="2.5" fill="rgba(77,217,240,0.6)"/>
+      <circle cx="165" cy="0" r="2.5" fill="rgba(77,217,240,0.6)"/>
+      <circle cx="0" cy="-165" r="2.5" fill="rgba(77,217,240,0.6)"/>
+
+      <!-- Face shape -->
+      <ellipse cx="0" cy="-5" rx="110" ry="135" fill="url(#faceGrad)" stroke="rgba(77,217,240,0.4)" stroke-width="1"/>
+
+      <!-- Fine mesh lines on face -->
+      <g clip-path="url(#faceClip)" opacity="0.35">
+        <!-- horizontal lines -->
+        <line x1="-110" y1="-90" x2="110" y2="-90" class="face-line"/>
+        <line x1="-110" y1="-70" x2="110" y2="-70" class="face-line"/>
+        <line x1="-110" y1="-50" x2="110" y2="-50" class="face-line"/>
+        <line x1="-110" y1="-30" x2="110" y2="-30" class="face-line"/>
+        <line x1="-110" y1="-10" x2="110" y2="-10" class="face-line"/>
+        <line x1="-110" y1="10" x2="110" y2="10" class="face-line"/>
+        <line x1="-110" y1="30" x2="110" y2="30" class="face-line"/>
+        <line x1="-110" y1="50" x2="110" y2="50" class="face-line"/>
+        <line x1="-110" y1="70" x2="110" y2="70" class="face-line"/>
+        <line x1="-110" y1="90" x2="110" y2="90" class="face-line"/>
+        <!-- vertical lines -->
+        <line x1="-80" y1="-140" x2="-80" y2="140" class="face-line"/>
+        <line x1="-60" y1="-140" x2="-60" y2="140" class="face-line"/>
+        <line x1="-40" y1="-140" x2="-40" y2="140" class="face-line"/>
+        <line x1="-20" y1="-140" x2="-20" y2="140" class="face-line"/>
+        <line x1="0"   y1="-140" x2="0"   y2="140" class="face-line"/>
+        <line x1="20"  y1="-140" x2="20"  y2="140" class="face-line"/>
+        <line x1="40"  y1="-140" x2="40"  y2="140" class="face-line"/>
+        <line x1="60"  y1="-140" x2="60"  y2="140" class="face-line"/>
+        <line x1="80"  y1="-140" x2="80"  y2="140" class="face-line"/>
+      </g>
+
+      <!-- Scan line -->
+      <line id="scan-line" x1="-110" y1="0" x2="110" y2="0" stroke="rgba(77,217,240,0.5)" stroke-width="1.5"/>
+
+      <!-- Facial landmark mesh (triangulation) -->
+      <!-- Forehead points -->
+      <g filter="url(#glow)" opacity="0.7">
+        <polyline points="0,-115 -45,-95 -80,-60 -90,-20 -75,30 -55,75 0,115 55,75 75,30 90,-20 80,-60 45,-95 0,-115" fill="none" stroke="rgba(77,217,240,0.4)" stroke-width="0.8"/>
+        <line x1="-45" y1="-95" x2="45" y2="-95" stroke="rgba(77,217,240,0.3)" stroke-width="0.6"/>
+        <line x1="-80" y1="-60" x2="-45" y2="-95" stroke="rgba(77,217,240,0.3)" stroke-width="0.6"/>
+        <line x1="80" y1="-60" x2="45" y2="-95" stroke="rgba(77,217,240,0.3)" stroke-width="0.6"/>
+        <!-- Cheek lines -->
+        <line x1="-90" y1="-20" x2="-55" y2="10" stroke="rgba(77,217,240,0.25)" stroke-width="0.6"/>
+        <line x1="90" y1="-20" x2="55" y2="10" stroke="rgba(77,217,240,0.25)" stroke-width="0.6"/>
+        <!-- Center vertical -->
+        <line x1="0" y1="-115" x2="0" y2="115" stroke="rgba(77,217,240,0.2)" stroke-width="0.5"/>
+        <!-- Nose bridge lines -->
+        <line x1="0" y1="-50" x2="-30" y2="-40" stroke="rgba(77,217,240,0.3)" stroke-width="0.6"/>
+        <line x1="0" y1="-50" x2="30" y2="-40" stroke="rgba(77,217,240,0.3)" stroke-width="0.6"/>
+        <line x1="-30" y1="-40" x2="-35" y2="5" stroke="rgba(77,217,240,0.3)" stroke-width="0.6"/>
+        <line x1="30" y1="-40" x2="35" y2="5" stroke="rgba(77,217,240,0.3)" stroke-width="0.6"/>
+        <!-- Cheek-nose -->
+        <line x1="-80" y1="-60" x2="-30" y2="-40" stroke="rgba(77,217,240,0.2)" stroke-width="0.5"/>
+        <line x1="80" y1="-60" x2="30" y2="-40" stroke="rgba(77,217,240,0.2)" stroke-width="0.5"/>
+        <!-- Mouth corners -->
+        <line x1="-35" y1="5" x2="-50" y2="50" stroke="rgba(77,217,240,0.2)" stroke-width="0.5"/>
+        <line x1="35" y1="5" x2="50" y2="50" stroke="rgba(77,217,240,0.2)" stroke-width="0.5"/>
+        <line x1="-55" y1="75" x2="-50" y2="50" stroke="rgba(77,217,240,0.2)" stroke-width="0.5"/>
+        <line x1="55" y1="75" x2="50" y2="50" stroke="rgba(77,217,240,0.2)" stroke-width="0.5"/>
+      </g>
+
+      <!-- Landmark dots -->
+      <g filter="url(#glow)">
+        <circle cx="0" cy="-115" r="2.5" fill="rgba(77,217,240,0.9)"/>
+        <circle cx="-45" cy="-95" r="2" fill="rgba(77,217,240,0.7)"/>
+        <circle cx="45" cy="-95" r="2" fill="rgba(77,217,240,0.7)"/>
+        <circle cx="-80" cy="-60" r="2" fill="rgba(77,217,240,0.7)"/>
+        <circle cx="80" cy="-60" r="2" fill="rgba(77,217,240,0.7)"/>
+        <circle cx="-90" cy="-20" r="2" fill="rgba(77,217,240,0.7)"/>
+        <circle cx="90" cy="-20" r="2" fill="rgba(77,217,240,0.7)"/>
+        <circle cx="-75" cy="30" r="2" fill="rgba(77,217,240,0.7)"/>
+        <circle cx="75" cy="30" r="2" fill="rgba(77,217,240,0.7)"/>
+        <circle cx="-55" cy="75" r="2" fill="rgba(77,217,240,0.7)"/>
+        <circle cx="55" cy="75" r="2" fill="rgba(77,217,240,0.7)"/>
+        <circle cx="0" cy="115" r="2.5" fill="rgba(77,217,240,0.9)"/>
+        <circle cx="0" cy="-50" r="2.5" fill="rgba(77,217,240,0.9)"/>
+        <circle cx="-35" cy="5" r="2" fill="rgba(77,217,240,0.7)"/>
+        <circle cx="35" cy="5" r="2" fill="rgba(77,217,240,0.7)"/>
+        <circle cx="-50" cy="50" r="2.5" fill="rgba(77,217,240,0.9)"/>
+        <circle cx="50" cy="50" r="2.5" fill="rgba(77,217,240,0.9)"/>
+      </g>
+
+      <!-- LEFT EYE -->
+      <g transform="translate(-50,-52)" class="eye-glow">
+        <ellipse cx="0" cy="0" rx="28" ry="16" fill="#030c1a" stroke="rgba(77,217,240,0.5)" stroke-width="1"/>
+        <ellipse cx="0" cy="0" rx="13" ry="13" fill="url(#eyeGrad)" filter="url(#glow)"/>
+        <circle cx="0" cy="0" r="7" fill="#020810"/>
+        <circle cx="-4" cy="-4" r="2.5" fill="rgba(255,255,255,0.6)"/>
+        <ellipse cx="0" cy="0" rx="28" ry="16" fill="none" stroke="rgba(77,217,240,0.7)" stroke-width="1.2"/>
+      </g>
+
+      <!-- RIGHT EYE -->
+      <g transform="translate(50,-52)" class="eye-glow">
+        <ellipse cx="0" cy="0" rx="28" ry="16" fill="#030c1a" stroke="rgba(77,217,240,0.5)" stroke-width="1"/>
+        <ellipse cx="0" cy="0" rx="13" ry="13" fill="url(#eyeGrad)" filter="url(#glow)"/>
+        <circle cx="0" cy="0" r="7" fill="#020810"/>
+        <circle cx="-4" cy="-4" r="2.5" fill="rgba(255,255,255,0.6)"/>
+        <ellipse cx="0" cy="0" rx="28" ry="16" fill="none" stroke="rgba(77,217,240,0.7)" stroke-width="1.2"/>
+      </g>
+
+      <!-- NOSE -->
+      <g filter="url(#glow)">
+        <path d="M0,-28 L-12,10 Q-18,18 -20,22 Q0,28 20,22 Q18,18 12,10 Z" fill="none" stroke="rgba(77,217,240,0.5)" stroke-width="1"/>
+        <ellipse cx="-15" cy="22" rx="7" ry="5" fill="none" stroke="rgba(77,217,240,0.4)" stroke-width="0.8"/>
+        <ellipse cx="15" cy="22" rx="7" ry="5" fill="none" stroke="rgba(77,217,240,0.4)" stroke-width="0.8"/>
+      </g>
+
+      <!-- MOUTH -->
+      <g id="mouth-group">
+        <!-- Inner mouth (dark gap) -->
+        <path id="inner-mouth" d="M-38,55 Q0,56 38,55 Q38,70 0,70 Q-38,70 -38,55 Z"/>
+        <!-- Lower lip -->
+        <path id="lower-lip" d="M-38,55 Q-20,72 0,72 Q20,72 38,55" filter="url(#glow)"/>
+        <!-- Upper lip -->
+        <path id="upper-lip" d="M-38,55 Q-20,48 0,50 Q20,48 38,55" filter="url(#glow)"/>
+        <!-- Mouth corner dots -->
+        <circle cx="-38" cy="55" r="2" fill="rgba(77,217,240,0.9)" filter="url(#glow)"/>
+        <circle cx="38" cy="55" r="2" fill="rgba(77,217,240,0.9)" filter="url(#glow)"/>
+        <circle cx="0" cy="50" r="1.5" fill="rgba(77,217,240,0.7)" filter="url(#glow)"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- CHAT PANEL -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="status-dot active" id="chat-dot"></span>
+      COMMUNICATION CHANNEL
+    </div>
+    <div id="chat-output">
+      <div class="msg msg-ai">
+        <span class="msg-label">// GKCEM</span>
+        <span class="msg-text">Neural interface initialized. I am GKCEM Ai. Ask me anything, or add custom Q&amp;A pairs below.</span>
+      </div>
+    </div>
+    <div class="input-area">
+      <input id="user-input" type="text" placeholder="> ENTER QUERY..." autocomplete="off" onkeydown="if(event.key==='Enter') sendMessage()"/>
+      <button id="send-btn" onclick="sendMessage()">TRANSMIT</button>
+    </div>
+  </div>
+
+  <!-- Q&A MANAGER -->
+  <div class="qa-manager">
+    <div class="panel-header" onclick="toggleQA()">
+      <span style="flex:1">⊞ &nbsp;CUSTOM Q&amp;A DATABASE</span>
+      <span id="qa-toggle-icon">▼</span>
+    </div>
+    <div class="qa-body" id="qa-body">
+      <div class="qa-add-row">
+        <input id="qa-q-input" placeholder="Question / keyword..." />
+        <input id="qa-a-input" placeholder="Answer / response..." />
+        <button onclick="addQA()">+ ADD PAIR</button>
+      </div>
+      <div id="qa-list"></div>
+    </div>
+  </div>
+
+</div><!-- /main-wrap -->
+
+<Script src="./script.js">
+  
+</Script>
+</body>
+</html>
